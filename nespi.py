@@ -12,7 +12,27 @@ from gpiozero import Button, LED
 # NESPi Cart Reader v0.1 by mike.g  #
 #        www.daftmike.com           #
 #####################################
- 
+
+# Moving some stuff of here that gets repeated below
+# and some other things that would make modifying easier
+RETRO_ARCH_CONNECT = ('127.0.0.1', 55355)
+ROM_PATH = "/home/pi/RetroPie/roms/"
+
+EMULATORS = ["amiga", "amstradcpc", "apple2", "arcade", "atari800", "atari2600", "atari5200", "atari7800",
+             "atarilynx", "atarist", "c64", "coco", "dragon32", "dreamcast", "fba", "fds", "gamegear", "gb", "gba",
+             "gbc", "intellivision", "macintosh", "mame-advmame", "mame-libretro", "mame-mame4all", "mastersystem",
+             "megadrive", "msx", "n64", "neogeo", "nes", "ngp", "ngpc", "pc", "ports", "psp", "psx", "scummvm",
+             "sega32x", "segacd", "sg-1000", "snes", "vectrex", "videopac", "wonderswan", "wonderswancolor",
+             "zmachine", "zxspectrum"]
+
+PROC_NAMES = ["retroarch", "ags", "uae4all2", "uae4arm", "capricerpi", "linapple", "hatari", "stella",
+              "atari800", "xroar", "vice", "daphne", "reicast", "pifba", "osmose", "gpsp", "jzintv",
+              "basiliskll", "mame", "advmame", "dgen", "openmsx", "mupen64plus", "gngeo", "dosbox", "ppsspp",
+              "simcoupe", "scummvm", "snes9x", "pisnes", "frotz", "fbzx", "fuse", "gemrb", "cgenesis", "zdoom",
+              "eduke32", "lincity", "love", "alephone", "micropolis", "openbor", "openttd", "opentyrian",
+              "cannonball", "tyrquake", "ioquake3", "residualvm", "xrick", "sdlpop", "uqm", "stratagus",
+              "wolf4sdl", "solarus", "emulationstation", "emulationstatio"]
+
  
 #############################################################################################
 # Sends 'message' to port 55355 for RetroArch's network commands
@@ -20,7 +40,7 @@ from gpiozero import Button, LED
 def retroarch_command(message):
     sock = socket.socket(socket.AF_INET,
                          socket.SOCK_DGRAM)
-    sock.sendto(message, ("127.0.0.1", 55355))
+    sock.sendto(message, RETRO_ARCH_CONNECT)
  
  
 #############################################################################################
@@ -73,14 +93,8 @@ def process_exists(proc_name):
 # Check if the console we read from NDEF Record #1 is valid, by checking against a list of supported emulators
  
 def check_console(console):
-    emulators = ["amiga", "amstradcpc", "apple2", "arcade", "atari800", "atari2600", "atari5200", "atari7800",
-                 "atarilynx", "atarist", "c64", "coco", "dragon32", "dreamcast", "fba", "fds", "gamegear", "gb", "gba",
-                 "gbc", "intellivision", "macintosh", "mame-advmame", "mame-libretro", "mame-mame4all", "mastersystem",
-                 "megadrive", "msx", "n64", "neogeo", "nes", "ngp", "ngpc", "pc", "ports", "psp", "psx", "scummvm",
-                 "sega32x", "segacd", "sg-1000", "snes", "vectrex", "videopac", "wonderswan", "wonderswancolor",
-                 "zmachine", "zxspectrum"]
-    if console != "":
-        if console in emulators:
+    if console: # Cleaner version of: if console != "":
+        if console in EMULATORS:
             print "NDEF Record \"" + console + "\" is a valid system...\n"
             return True
  
@@ -104,7 +118,7 @@ def get_emulatorpath(console):
  
 def check_rom(console, rom):
     # get full rom path and check if it's a file
-    romfile = "/home/pi/RetroPie/roms/" + console + "/" + rom
+    romfile = ROM_PATH + console + "/" + rom
     if os.path.isfile(romfile):
         print "Found \"" + rom + "\"\n"
         ser.write("ok")  # Tell Arduino the cart read was successful
@@ -127,7 +141,7 @@ def get_rompath(console, rom):
     rom = rom.replace(")", "\)")
     rom = rom.replace("'", "\\'")
  
-    rompath = "/home/pi/RetroPie/roms/" + console + "/" + rom
+    rompath = ROM_PATH + console + "/" + rom
     return rompath
  
  
@@ -136,14 +150,7 @@ def get_rompath(console, rom):
  
 def button_on():
     if cartok:
-        procnames = ["retroarch", "ags", "uae4all2", "uae4arm", "capricerpi", "linapple", "hatari", "stella",
-                     "atari800", "xroar", "vice", "daphne", "reicast", "pifba", "osmose", "gpsp", "jzintv",
-                     "basiliskll", "mame", "advmame", "dgen", "openmsx", "mupen64plus", "gngeo", "dosbox", "ppsspp",
-                     "simcoupe", "scummvm", "snes9x", "pisnes", "frotz", "fbzx", "fuse", "gemrb", "cgenesis", "zdoom",
-                     "eduke32", "lincity", "love", "alephone", "micropolis", "openbor", "openttd", "opentyrian",
-                     "cannonball", "tyrquake", "ioquake3", "residualvm", "xrick", "sdlpop", "uqm", "stratagus",
-                     "wolf4sdl", "solarus", "emulationstation", "emulationstatio"]
-        killtasks(procnames)
+        killtasks(PROC_NAMES)
         subprocess.call("sudo openvt -c 1 -s -f " + emulatorpath + rompath + "&", shell=True)
         subprocess.call("sudo chown pi -R /tmp", shell=True)  # ES needs permission as 'pi' to access this later
         time.sleep(1)
@@ -159,14 +166,7 @@ def button_off():
     if process_exists("emulationstation"):
         print "\nemulationstation is running...\n"
     else:
-        procnames = ["retroarch", "ags", "uae4all2", "uae4arm", "capricerpi", "linapple", "hatari", "stella",
-                     "atari800", "xroar", "vice", "daphne", "reicast", "pifba", "osmose", "gpsp", "jzintv",
-                     "basiliskll", "mame", "advmame", "dgen", "openmsx", "mupen64plus", "gngeo", "dosbox", "ppsspp",
-                     "simcoupe", "scummvm", "snes9x", "pisnes", "frotz", "fbzx", "fuse", "gemrb", "cgenesis", "zdoom",
-                     "eduke32", "lincity", "love", "alephone", "micropolis", "openbor", "openttd", "opentyrian",
-                     "cannonball", "tyrquake", "ioquake3", "residualvm", "xrick", "sdlpop", "uqm", "stratagus",
-                     "wolf4sdl", "solarus"]
-        killtasks(procnames)
+        killtasks(PROC_NAMES)
  
  
 #  I check if ES is running here because if it *is* then any running game was launched from within ES
