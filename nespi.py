@@ -203,8 +203,8 @@ def button_off():
     if process_exists("emulationstation"):
         print "\nemulationstation is running...\n"
         with open('/home/pi/romdetails.txt') as myfile:
-            romstring=myfile.readline().replace('\n', '')
-            print romstring
+            romstring=myfile.readline().replace('/home/pi/RetroPie/roms', 'rom')
+            romstring=romstring.replace('\n', '')
             ser.write(romstring)
     else:
         procnames = ["retroarch", "ags", "uae4all2", "uae4arm", "capricerpi", "linapple", "hatari", "stella",
