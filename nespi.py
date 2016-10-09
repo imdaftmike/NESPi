@@ -202,7 +202,7 @@ def button_on():
 def button_off():
     if process_exists("emulationstation"):
         print "\nemulationstation is running...\n"
-        with open('/home/pi/romdetails.txt') as myfile:
+        with open('/home/pi/NESPi/romdetails.txt') as myfile:
             romstring=myfile.readline().replace('/home/pi/RetroPie/roms', 'rom')
             romstring=romstring.replace('\n', '')
             ser.write(romstring)
