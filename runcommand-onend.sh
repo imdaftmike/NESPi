@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-rom="$3"
-echo "$rom" > /home/pi/NESPi/romdetails.txt
+echo "rom" > /home/pi/NESPi/romdetails.txt
+echo "$3" > /home/pi/NESPi/romdetails.txt
