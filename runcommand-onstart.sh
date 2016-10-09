@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-echo $3 > romdetails.txt
+echo $3 > /home/pi/romdetails.txt
