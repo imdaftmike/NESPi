@@ -36,7 +36,7 @@ def get_cpu_temperature():
 #############################################################################################
 # Check the CPU temp every 10 seconds and switch the fan on/off if needed
 
-old_temp = 0
+old_temp = 200
 def cpufan():
     fanon = 65 # fan turns ON above this temp
     fanoff = 50 # fan turns OFF below this temp
