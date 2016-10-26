@@ -17,8 +17,9 @@ from gpiozero import Button, LED
 
 
 #############################################################################################
-# Setup the serial port and tell arduino we're ready (allows us to start with a cart already inserted at power-on)
+# Setup the serial port and remove old romdetails.txt
 
+subprocess.call(["sudo", "rm", "/home/pi/NESPi/romdetails.txt"])
 ser = serial.Serial("/dev/ttyS0", 9600, timeout=None)
 time.sleep(2)
 ser.write("ready")
@@ -36,20 +37,19 @@ def get_cpu_temperature():
 #############################################################################################
 # Check the CPU temp every 10 seconds and switch the fan on/off if needed
 
-old_temp = 200
 def cpufan():
+
     fanon = 65 # fan turns ON above this temp
-    fanoff = 50 # fan turns OFF below this temp
-    global old_temp
+    fanoff = 55 # fan turns OFF below this temp
+
     threading.Timer(10.0, cpufan).start()
     cpu_temp = get_cpu_temperature()
-    if cpu_temp > fanon and old_temp < fanon:
+    if cpu_temp > fanon:
         print "turning the fan ON ...\n"
         ser.write("fanon")
-    if cpu_temp < fanoff and old_temp > fanoff:
+    if cpu_temp < fanoff:
         print "turning the fan OFF ...\n"
         ser.write("fanoff")
-    old_temp = cpu_temp
 cpufan()
 
 
@@ -57,7 +57,7 @@ cpufan()
 #  to decide if we want to turn the fan on or off.
 #  But I only want to send the fan message when the temperature crosses the setpoints.
 #  In C on Arduino, I'd detect the 'rising/falling edges' by keeping track of the old value.
-#  This code works ok, but I'm not sure how to do it in a Python-way :/
+#  but I'm not sure how to do it in a Python-way :/
 
 #############################################################################################
 # Sends 'message' to port 55355 for RetroArch's network commands
