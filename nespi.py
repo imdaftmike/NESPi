@@ -192,6 +192,7 @@ def button_on():
         subprocess.call("sudo openvt -c 1 -s -f " + emulatorpath + rompath + "&", shell=True)
         subprocess.call("sudo chown pi -R /dev/shm", shell=True)  # ES needs permission as 'pi' to access this later
         time.sleep(1)
+        subprocess.call("sudo chown pi -R /home/pi/NESPi/romdetails.txt", shell=True)
     else:
         print "no valid cartridge inserted...\n"
 
