@@ -45,10 +45,8 @@ def cpufan():
     threading.Timer(10.0, cpufan).start()
     cpu_temp = get_cpu_temperature()
     if cpu_temp > fanon:
-        print "turning the fan ON ...\n"
         ser.write("fanon")
     if cpu_temp < fanoff:
-        print "turning the fan OFF ...\n"
         ser.write("fanoff")
 cpufan()
 
@@ -180,6 +178,7 @@ def get_rompath(console, rom):
 # If the cartridge is valid when the button is switched on then we can launch the rom
 
 def button_on():
+    print "power button turned ON...\n"
     if cartok:
         procnames = ["retroarch", "ags", "uae4all2", "uae4arm", "capricerpi", "linapple", "hatari", "stella",
                      "atari800", "xroar", "vice", "daphne", "reicast", "pifba", "osmose", "gpsp", "jzintv",
@@ -201,6 +200,7 @@ def button_on():
 # Close the emulator when the button is pushed again ("off")
 
 def button_off():
+    print "power button turned OFF...\n"
     if process_exists("emulationstation"):
         print "\nemulationstation is running...\n"
         with open('/home/pi/NESPi/romdetails.txt') as myfile:
